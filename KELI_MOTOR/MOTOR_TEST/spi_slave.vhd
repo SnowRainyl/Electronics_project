@@ -45,6 +45,7 @@ begin
         if cs_n = '1' then
             bit_cnt    <= 0;
             shift_reg  <= (others => '0');
+            valid_reg  <= '0';
 
         elsif rising_edge(sck) then
             valid_reg  <= '0';
