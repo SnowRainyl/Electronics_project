@@ -1,3 +1,17 @@
-.claude/settings.local.json
+# Keil build output
 *.uvguix.*
 KELI_MOTOR_REBUILD/MDK-ARM/KELI_MOTOR_REBUILD/
+MOTOR_TEST/MDK-ARM/MOTOR_TEST/
+
+# STM32 auto-generated library (CMSIS/HAL)
+**/Drivers/
+
+# STM32CubeMX test project boilerplate
+MOTOR_TEST/Core/
+MOTOR_TEST/MDK-ARM/
+MOTOR_TEST/.mxproject
+MOTOR_TEST/MOTOR_TEST.ioc
+
+# Tool internals
+.claude/
+**/.claude/
