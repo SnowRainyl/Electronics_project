@@ -38,23 +38,28 @@ void i2c_write_memory(uint8_t slav_add, uint8_t memadd, uint8_t data, uint8_t le
     I2C1->SR1 &= ~(I2C_SR1_AF | I2C_SR1_ARLO | I2C_SR1_BERR | I2C_SR1_OVR);
 
     t = I2C_TIMEOUT;
+    //no busy continue
     while ((I2C1->SR2 & I2C_SR2_BUSY) && --t) {}
     if (!t) { return; }
 
+    //start
     I2C1->CR1 |= I2C_CR1_START;
     t = I2C_TIMEOUT;
+    //error dealing
     while (!(I2C1->SR1 & I2C_SR1_SB) && --t) {}
     if (!t) { I2C1->CR1 |= I2C_CR1_STOP; return; }
 
+    //if every thing ok, send addr
     I2C1->DR = (uint8_t)(slav_add << 1U);
     t = I2C_TIMEOUT;
+    // send addr, need ack, so check the I2C_SR1_ADDR, if receive the ACK,I2C_SR1_ADDR=1
     while (!(I2C1->SR1 & I2C_SR1_ADDR) && --t) {}
     if (!t) {
         I2C1->SR1 &= ~I2C_SR1_AF;
         I2C1->CR1 |= I2C_CR1_STOP;
         return;
     }
-
+    //RM: "Then the master waits for a read of the SR1 register followed by a read of the SR2 register"
     (void)I2C1->SR1;   /* clear ADDR by reading SR1 then SR2 */
     (void)I2C1->SR2;
 

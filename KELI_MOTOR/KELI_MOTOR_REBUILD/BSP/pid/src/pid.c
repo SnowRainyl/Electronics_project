@@ -17,12 +17,13 @@ void PID_Init(PID_TypeDef *pid,
 
 float PID_Calc(PID_TypeDef *pid, float setpoint, float feedback)
 {
+    //this is P
     float err = setpoint - feedback;
-
+//this is I
     pid->integral += err;
     if      (pid->integral >  pid->integral_max) { pid->integral =  pid->integral_max; }
     else if (pid->integral < -pid->integral_max) { pid->integral = -pid->integral_max; }
-
+//below is D, still calculate but the relsted K is 0
     float deriv   = pid->kd * (err - pid->err_prev);
     pid->err_prev = err;
 

@@ -24,7 +24,7 @@ void UART_Init(void)
 
     s_rx_head = 0U;
     s_rx_tail = 0U;
-    USART2->CR1 = USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE | USART_CR1_UE;
+    USART2->CR1 = USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE | USART_CR1_UE;//RXNEIE: DR recv the data then generate the interuppt
     NVIC_SetPriority(USART2_IRQn, 1U);
     NVIC_EnableIRQ(USART2_IRQn);
 }
@@ -53,7 +53,7 @@ uint8_t UART_RecvChar(char *c)
     return 1U;
 }
 
-void USART2_IRQHandler(void)
+void USART2_IRQHandler(void)//receive uses interrupt
 {
     uint32_t sr = USART2->SR;
 

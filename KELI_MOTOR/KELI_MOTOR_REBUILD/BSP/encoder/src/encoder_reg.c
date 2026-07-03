@@ -21,8 +21,8 @@ void Encoder_Init(void)
 {
     uint32_t i;
 
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
-    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;//make pc6and pc7 registers can be configured
+    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN; //make TIM3 registers canbe configured and executed
     (void)RCC->APB1ENR;
 
     /* PC6, PC7 — AF2 (TIM3), pull-up, high speed */
@@ -34,7 +34,7 @@ void Encoder_Init(void)
     GPIOC->AFR[0]  &= ~((0xFUL << (6U * 4U)) | (0xFUL << (7U * 4U)));
     GPIOC->AFR[0]  |=  ((0x2UL << (6U * 4U)) | (0x2UL << (7U * 4U)));
 
-    TIM3->PSC = 0U;
+    TIM3->PSC = 0U; //encode mode, cnt increase base on the speed of motor, cnt only waits the rising/falling edge.
     TIM3->ARR = ENCODER_TIM_ARR;
 
     /* Encoder mode 3: both TI1 and TI2 edges count (x4 decode)
@@ -46,10 +46,10 @@ void Encoder_Init(void)
     TIM3->CCER  = 0U;
     TIM3->SMCR  = (3UL << 0U);   /* SMS=011: encoder mode 3 */
 
-    TIM3->CNT = ENCODER_CNT_CENTER;
+    TIM3->CNT = ENCODER_CNT_CENTER;//16bits middle=0x8000
     s_last_cnt = ENCODER_CNT_CENTER;
 
-    s_rpm_idx = 0U;
+    s_rpm_idx = 0U;  //clear out the previous RPM_filter output
     s_rpm_sum = 0.0f;
     for (i = 0U; i < ENCODER_FILTER_SIZE; i++) { s_rpm_buf[i] = 0.0f; }
 

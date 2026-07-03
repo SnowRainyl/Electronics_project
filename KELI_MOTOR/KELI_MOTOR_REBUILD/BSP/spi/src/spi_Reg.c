@@ -44,7 +44,7 @@ void SPI2_FPGA_Init(void)
     GPIOB->MODER   &= ~(3U << (12U * 2U));
     GPIOB->MODER   |=  (1U << (12U * 2U));
     GPIOB->OSPEEDR |=  (3U << (12U * 2U));
-    FPGA_CS_HIGH();
+    FPGA_CS_HIGH();//high and wait for low to start
 
     /* PB13=SCK, PB14=MISO, PB15=MOSI — AF5 (AFRH: pin-8 offset) */
     GPIOB->MODER   &= ~((3U << (13U * 2U)) | (3U << (14U * 2U)) | (3U << (15U * 2U)));
@@ -53,9 +53,10 @@ void SPI2_FPGA_Init(void)
     GPIOB->AFR[1]  &= ~((0xFU << ((13U - 8U) * 4U)) | (0xFU << ((14U - 8U) * 4U)) | (0xFU << ((15U - 8U) * 4U)));
     GPIOB->AFR[1]  |=  ((5U   << ((13U - 8U) * 4U)) | (5U   << ((14U - 8U) * 4U)) | (5U   << ((15U - 8U) * 4U)));
 
-    SPI2->CR1 = 0U;
+    SPI2->CR1 = 0U;//default cpol and cpha=0=>mode0=>empty sck low and first edge sample
     SPI2->CR1 |= (2U << SPI_CR1_BR_Pos);   /* BR=010: fPCLK/8 */
-    SPI2->CR1 |= SPI_CR1_SSM | SPI_CR1_SSI | SPI_CR1_MSTR;
+    SPI2->CR1 |= SPI_CR1_SSM | SPI_CR1_SSI | SPI_CR1_MSTR;//software cs, ssi along with ssm， ssi priority is higer than MSTR
+    //if ssi=0， force MSTR=0， stm32 is slave
     SPI2->CR1 |= SPI_CR1_SPE;
 }
 
@@ -65,4 +66,6 @@ uint8_t SPI2_ReadWriteByte(uint8_t tx_data)
     *(volatile uint8_t *)&SPI2->DR = tx_data;
     while (!(SPI2->SR & SPI_SR_RXNE)) {}
     return *(volatile uint8_t *)&SPI2->DR;
+    //read and send are binding， if no data, send 0 
+    //but my fpga doesn't connect line, so the data is uncertain value.
 }

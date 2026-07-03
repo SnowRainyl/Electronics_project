@@ -83,8 +83,8 @@ void TIM6_DAC_IRQHandler(void)
     static uint8_t  speed_loop_count = 0U;
     static uint16_t duty_applied     = 0U;
 
-    if (!(TIM6->SR & TIM_SR_UIF)) { return; }
-    TIM6->SR &= ~TIM_SR_UIF;
+    if (!(TIM6->SR & TIM_SR_UIF)) { return; }// make sure this interrupt is triggered by TIM6, due to this interrupt is shared by TIM6 and DAC
+    TIM6->SR &= ~TIM_SR_UIF;// clear the interrupt flag
 
     /* 1. Read inputs */
     uint16_t adc_val = ADC1_Read_Filtered();
@@ -100,6 +100,7 @@ void TIM6_DAC_IRQHandler(void)
 
     float measured_current = ADC1_ReadCurrent_Filtered_mA();
 
+    //10ms vs 1ms 
     speed_loop_count++;
     uint8_t speed_loop_due = 0U;
     if (speed_loop_count >= SPEED_LOOP_DIVIDER) {
@@ -126,6 +127,7 @@ void TIM6_DAC_IRQHandler(void)
             speed_pid.integral   *= SPEED_HANDOFF_KEEP;
             current_pid.integral *= CURRENT_HANDOFF_KEEP;
             duty_applied = (uint16_t)((float)duty_applied * DUTY_HANDOFF_KEEP);
+            //these 3 parameters recude.
             g_motor_state = MOTOR_RUNNING;
         }
         break;
@@ -155,10 +157,12 @@ void TIM6_DAC_IRQHandler(void)
         if (speed_loop_due) {
             g_current_setpoint_mA = PID_Calc(&speed_pid, setpoint_rpm, g_encoder_rpm);
 
+            //the additional limitation of starting state
             if (g_motor_state == MOTOR_STARTING) {
                 if (speed_pid.integral > SPEED_START_INTEGRAL_MAX) {
                     speed_pid.integral = SPEED_START_INTEGRAL_MAX;
                 }
+                //the static friction~=90ma
                 if (g_current_setpoint_mA > SPEED_START_ISET_MAX) {
                     g_current_setpoint_mA = SPEED_START_ISET_MAX;
                 }

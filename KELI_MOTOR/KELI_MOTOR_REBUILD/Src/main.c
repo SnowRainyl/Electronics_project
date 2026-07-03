@@ -166,7 +166,7 @@ static uint8_t PollPidCommand(void)
 
     while (HAL_GetTick() - t0 < 200U) {
         char ch;
-        if (UART_RecvChar(&ch)) {
+        if (UART_RecvChar(&ch)) {//read the buf data， read 1 byte and write to ch
             rx_active    = 1U;
             last_rx_tick = HAL_GetTick();
             if (ch == '\r' || ch == '\n') {
@@ -268,8 +268,8 @@ int main(void)
         if (!rx_active) {
             MotorTelemetry t;
             Motor_GetTelemetry(&t);
-            PrintMotorStatus(&t);
-            UpdateOled(&t);
+            PrintMotorStatus(&t);  //uart shows
+            UpdateOled(&t);        //oled shows
         }
     }
 }
