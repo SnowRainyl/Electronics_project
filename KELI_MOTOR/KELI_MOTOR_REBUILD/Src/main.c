@@ -210,6 +210,7 @@ static void UpdateOled(const MotorTelemetry *t)
     char  oled_buf[22];
     float display_rpm     = (t->duty == 0U || (t->rpm > -0.05f && t->rpm < 0.05f)) ? 0.0f : t->rpm;
     float display_current = (t->current_mA < 0.05f) ? 0.0f : t->current_mA;
+    //6x8 1 empty 1 line
     snprintf(oled_buf, sizeof(oled_buf), "%-5s RPM:%-5.1f", Motor_State_Name(t->state), (double)display_rpm);
     OLED_ShowStr(0U, 2U, (uint8_t *)oled_buf, FontSize6x8, 0U);
     snprintf(oled_buf, sizeof(oled_buf), "Duty:%-6.1f%%", (double)t->duty / 40.95);

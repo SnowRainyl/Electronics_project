@@ -26,7 +26,7 @@ void OLED_Fill(uint8_t fill_data)
         }
     }
 }
-
+/*
 void OLED_LocalFill(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t data)
 {
     uint8_t i, j;
@@ -38,6 +38,7 @@ void OLED_LocalFill(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t data
     }
 }
 
+*/
 void OLED_Init(void)
 {
     OLED_Delay_ms(200U);
@@ -90,12 +91,12 @@ void OLED_ShowChar(uint8_t x, uint8_t y, uint8_t ch, uint8_t font_size, uint8_t 
     switch (font_size) {
     case FontSize6x8:
         OLED_SetPos(x, y);
-        for (i = 0U; i < 6U; i++) {
+        for (i = 0U; i < 6U; i++) {// 6 bytes
             uint8_t b = F6X8[c * 6U + i];
             OLED_Write_Byte(invert ? ~b : b, DataReg);
         }
         break;
-    case FontSize8x16:
+    case FontSize8x16://16 bytes but split 2 parts
         OLED_SetPos(x, y);
         for (i = 0U; i < 8U; i++) {
             uint8_t b = F8X16[c * 16U + i];
@@ -119,9 +120,9 @@ void OLED_ShowStr(uint8_t x, uint8_t y, uint8_t *str, uint8_t font_size, uint8_t
 
     while (str[j] != '\0') {
         OLED_ShowChar(x, y, str[j], font_size, invert);
-        x += step;
-        if (font_size == FontSize6x8  && x > 122U) { x = 0U; y++; }
-        if (font_size == FontSize8x16 && x > 120U) { x = 0U; y++; }
+        x += step;//each char 6 pixels
+        if (font_size == FontSize6x8  && x > 122U) { x = 0U; y++; }//auto next line
+        if (font_size == FontSize8x16 && x > 120U) { x = 0U; y++; }//auto next line
         j++;
     }
 }

@@ -31,7 +31,7 @@ void i2c_write_memory(uint8_t slav_add, uint8_t memadd, uint8_t data, uint8_t le
     uint32_t t;
     (void)length;   /* only single-byte data supported */
 
-    send_arr[0] = memadd;
+    send_arr[0] = memadd;//CmdReg or DataReg--》control byte
     send_arr[1] = data;
 
     /* Clear residual error flags before starting a new transaction */
